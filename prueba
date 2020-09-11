@@ -1,0 +1,14 @@
+```{r}
+library(rio)   # libreria muy potente
+```
+
+
+```{r}
+lkDTA="https://github.com/PoliticayGobiernoPUCP/estadistica_anapol2/raw/master/DATA/lapop2012.dta"
+dataStata=import(lkDTA)
+```
+
+Para verificar qué tenemos, podemos ver la ventana Environment, o pedir un reporte sencillo:
+```{r}
+dim(dataStata) #filas, columnas
+```
