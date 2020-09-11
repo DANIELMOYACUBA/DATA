@@ -1,0 +1,155 @@
+```{r}
+
+library(htmltab) 
+
+linkCIA_urb = "https://www.cia.gov/library/publications/resources/the-world-factbook/fields/274.html"
+linkPath_urb='//*[@id="fieldListing"]'
+
+urban = htmltab(doc = linkCIA_urb, 
+                which =linkPath_urb)
+## No encoding supplied: defaulting to UTF-8.
+#Tenemos los datos, pero no están bien:
+
+head(urban)
+
+```
+```{r}
+View(urban)  #ver base original
+```
+
+```{r}
+names(urban)=c("PAIS","EMI")   # cambio de nombres de base urban para indentificar mejor campos
+```
+
+
+
+```{r}
+
+library(stringr) # permite manipular cadenas (strings)  como SPLIT para "partir" cadena
+
+urban$AUX1=str_split(urban$EMI,
+                         pattern = '2017',
+                         simplify = T)[,1]  # se genera nuevo campo con lo q esta a la izquierda de 2017
+
+
+urban$AUX2=str_split(urban$EMI,
+                         pattern = 'Mt',
+                         simplify = T)[,2]  # se genera nuevo campo con lo q esta a la derecha de Mt
+
+
+# para ver efecto ver la base modificada
+
+View(urban)
+```
+
+
+
+```{R}
+#DE LA COLUMNA CREADA AUX1 SACO EL PRIMER NUMERO Q HALLE. ALGUNOS SE QUEDARAN COMO VECTOR COMO FILA
+# NUMERO 5 DE AMERICAN SAMOA  :  	c("361", "100") . ESO SE CORREGIRA DESPUES
+
+urban$AUX1=str_extract_all(urban$AUX1,"\\d+\\.*\\d*")
+
+```
+
+
+```{R}
+#DE LA COLUMNA CREADA AUX2 SACO EL PRIMER NUMERO Q HALLE.ACA NO HAY PROBLEMAS. EN ESTA 
+#COLUMNA NO HAY NADA MAS QUE HACER. EL VACILON ES LA COLUMNA AUX1
+
+urban$AUX2=str_extract_all(urban$AUX2,"\\d+\\.*\\d*")
+
+
+# VER BASE CAMBIOS EN BASE urban
+
+
+```
+
+
+
+########### TRABAJO CON LA COLUMNA AUX1 Q TIENE ALGUNOS PROBLEMAS
+
+```{r}
+# GENERO OTRA COLUMNA AUX3 Y PARA LA AUX1 DESDE "," Y ME QUEDO CON LA PARTE DE LA IZQUIERDA
+# VER BASE PARA VER EFECTO PERO TB SE PRESENTAN ALGUNOS PROBLEMAS COMO FILA 5
+urban$AUX3=str_split(urban$AUX1,
+                         pattern = ',',
+                         simplify = T)[,1]  #
+
+```
+
+
+```{r}
+# CON ESTO EXTRAIGO EL PRIMER NUMERO QUE HALLE DE LA COLUMNA AUX3
+
+urban$AUX3=str_extract_all(urban$AUX3,"\\d+\\.*\\d*")
+
+# VER BASE PARA VER CAMBIO
+```
+
+
+```{r}
+#CREO AUX4 QUE PARTE AUX1 DESDE "," Y GRABO LO Q ESTA A LA DERECHA EN AUX4
+
+urban$AUX4=str_split(urban$AUX1,
+                         pattern = ',',
+                         simplify = T)[,2]  #
+
+#VER BASE. SE VERA Q ALGUNAS CELDAS ESTAN VACIAS
+```
+
+```{r}
+# DE LA COLUMNA AUX4 OBTENGO EL PRIMER QUE ENCUENTRE
+
+urban$AUX4=str_extract_all(urban$AUX4,"\\d+\\.*\\d*")
+# OJO ACA VER EN LA  TABLA LA COLUMNA AUX4... HAN APRECIDO VARIOS :  character(0)
+
+```
+
+
+```{r}
+# COMO SE DIJO, HA APARECIDO VARIOS character(0) PARA CORREGIR VUELVO A CORRER LA FUNCION ANTERIOR
+urban$AUX4=str_extract_all(urban$AUX4,"\\d+\\.*\\d*")
+
+
+```
+
+
+```{r}
+
+# POR ULTIMO UNO LA AUX3 CON AUX4 PARA FORMAR EL NUMERO FINAL Q NECESTIAMOS Y LO GUARDO EN 
+#UNA NUEVA COLUMNA AUX5
+
+
+urban$AUX5=paste0(urban$AUX3,urban$AUX4)
+
+# VER BASE
+```
+
+
+
+######AHORA  CREO UNA NUEVA BASE CON LOS CAMPOS Q NECESITO
+
+```{R}
+porfin=urban[c(1,7,4)]
+
+# ver nueva base
+View(porfin)
+
+```
+
+
+```{r}
+#cambio nombres de la base depurada
+
+names(porfin)=c("PAIS","EMISION CARBONO TN","PERIODO")
+
+
+
+# VER FINAL DE LA BASE REQUERIDA
+
+View(porfin)
+
+```
+
+
